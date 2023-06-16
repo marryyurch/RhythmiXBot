@@ -87,7 +87,7 @@ namespace TelegramBot
                         BaseAddress = new Uri("https://localhost:7065/")
                     };
 
-                    await _s3Client.PostAsync($"api/buckets/create/{bucketName}", new StringContent("bucket-name"));
+                    await _s3Client.PostAsync($"api/buckets/create?bucketName={bucketName}", new StringContent("bucket-name"));
 
                     var response = _s3Client.PostAsync("api/files/upload", fileFormData);
                     if (!response.IsCompletedSuccessfully)

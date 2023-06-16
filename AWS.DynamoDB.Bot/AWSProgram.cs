@@ -14,7 +14,7 @@ namespace AWS.DynamoDB.Bot
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
+            
             var awsOptions = builder.Configuration.GetAWSOptions();
             builder.Services.AddDefaultAWSOptions(awsOptions);
             builder.Services.AddAWSService<IAmazonDynamoDB>();
