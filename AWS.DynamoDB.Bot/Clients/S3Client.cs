@@ -1,5 +1,4 @@
-﻿using Amazon.DynamoDBv2.Model;
-using Amazon.S3;
+﻿using Amazon.S3;
 using Amazon.S3.Model;
 using S3Object = S3.Demo.API.Models.S3Object;
 

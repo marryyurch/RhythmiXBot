@@ -1,5 +1,4 @@
-﻿using Amazon.DynamoDBv2.Model;
-using AWS.DynamoDB.Bot.Clients;
+﻿using AWS.DynamoDB.Bot.Clients;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AWS.DynamoDB.Bot.Controllers;
@@ -14,7 +13,7 @@ public class BucketsController : ControllerBase
         _s3Client = s3Client;
     }
 
-    [HttpPost("create/{bucketName}")]
+    [HttpPost("create")]
     public async Task<IActionResult> CreateBucketAsync(string bucketName)
     {
         if (await _s3Client.CreateBucketAsync(bucketName))
