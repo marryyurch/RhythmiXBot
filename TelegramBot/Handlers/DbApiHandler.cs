@@ -1,6 +1,8 @@
 ﻿using System.Net.Http.Json;
 using Newtonsoft.Json;
-using TelegramBot.Models;
+using Telegram.Bot.Types;
+using User = TelegramBot.Models.User;
+
 namespace TelegramBot.Handlers
 {
     internal static class DbApiHandler
@@ -9,7 +11,7 @@ namespace TelegramBot.Handlers
         {
             BaseAddress = new Uri("https://localhost:7065/")
         };
-        private static Dictionary<long, string> userIds = new(); // bot user and dB Id  
+        public static Dictionary<long, string> userIds = new(); // bot user and dB Id  
         private static Dictionary<long, string> unsignedUserIds = new();
 
         public static async Task<User?> CreateUser(long id, string name, string password)
@@ -60,15 +62,19 @@ namespace TelegramBot.Handlers
         public static async Task<bool> SignOut(long id)
         {
             if (unsignedUserIds.ContainsKey(id)) return false;
-            unsignedUserIds.Add(id, userIds[id]);
             if (userIds.ContainsKey(id))
-                userIds[id] = null;
-            return true;
+            {
+                unsignedUserIds.Add(id, userIds[id]);
+                userIds[id] = null; 
+                return true;
+            }
+
+            return false;
         }
 
         public static async Task<bool> IsSignedIn(long id)
         {
-            if (!unsignedUserIds.ContainsKey(id))
+            if (!unsignedUserIds.ContainsKey(id) && userIds.ContainsKey(id))
                 return true;
             return false;
         }

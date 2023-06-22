@@ -51,7 +51,7 @@ namespace TelegramBot.Handlers
                     if (await DbApiHandler.SignOut(callbackQuery.From.Id))
                         await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "You successfuly signed out.");
                     else
-                        await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "You already sign out or create profile or sign in if you want to do it..");
+                        await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "I can't sign you out. There can be some factors:\n- You already sign out\n- You have to create a profile first");
                     await botClient.AnswerCallbackQueryAsync(callbackQuery.Id);
                     break;
                 }
@@ -104,6 +104,30 @@ namespace TelegramBot.Handlers
             }
         }
 
+        public static async Task HandleSpotiOpsCallbackQueryAsync(ITelegramBotClient botClient, CallbackQuery? callbackQuery)
+        {
+            _callbackQueryParts = callbackQuery.Data.Split('_');
+            _callbackType = _callbackQueryParts[0];
+
+            if (IsQueryOutdated(callbackQuery))
+                return;
+
+            switch (_callbackType)
+            {
+                case "getting all spoty users' playlists":
+                {
+                    await botClient.SendTextMessageAsync(callbackQuery.Message.Chat,
+                        await SpotifyUserManager.GetPlaylists());
+                    break;
+                }
+                case "getting someone's playlists":
+                {
+
+                    break;
+                }
+            }
+        }
+
         public static async Task HandleMusicOpsCallbackQueryAsync(ITelegramBotClient botClient, CallbackQuery? callbackQuery)
         {
             _callbackQueryParts = callbackQuery.Data.Split('_');
@@ -116,18 +140,20 @@ namespace TelegramBot.Handlers
             {
                 case "adding song":
                 {
-                    
+                    await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Load here your mp3 file");
                     await botClient.AnswerCallbackQueryAsync(callbackQuery.Id);
                     break;
                 }
                 case "showing all songs":
                 {
-
+                    await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Here's all your songs");
+                    await S3ApiHandler.DownloadAllSongs(botClient, callbackQuery);
                     await botClient.AnswerCallbackQueryAsync(callbackQuery.Id);
                     break;
                 }
                 case "deleting song":
                 {
+                    await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Enter song name");
 
                     await botClient.AnswerCallbackQueryAsync(callbackQuery.Id);
                     break;

@@ -33,19 +33,6 @@ namespace MusicAPI.Clients
 
             return token;
         }
-
-        public async Task<FullPlaylist> GetPlaylist(string playlistId)
-        {
-            var playlist = await _spotifyClient.Playlists.Get(playlistId);
-            return playlist;
-        }
-
-        public async Task<PrivateUser> GetCurrentUser()
-        {
-            var user = await _spotifyClient.UserProfile.Current();
-            return user;
-        }
-
         public string SendAuthorizationLink()
         {
             string botUrl = "https://t.me/RtmXBot";
@@ -62,6 +49,21 @@ namespace MusicAPI.Clients
                    $"{_clientID}&response_type=code&" +
                    $"redirect_uri={botUrl}&" +
                    $"scope={scopes}";
+        }
+
+        public async Task<FullPlaylist> GetPlaylist(string playlistId)
+        {
+            return await _spotifyClient.Playlists.Get(playlistId);
+        }
+
+        public async Task<PrivateUser> GetCurrentUser()
+        {
+            return await _spotifyClient.UserProfile.Current();
+        }
+
+        public async Task<Paging<SimplePlaylist>> GetCurrentUserPlaylistList()
+        {
+            return await _spotifyClient.Playlists.CurrentUsers();
         }
     }
 }

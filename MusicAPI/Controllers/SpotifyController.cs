@@ -15,7 +15,7 @@ namespace MusicAPI.Controllers
             _musicClient = musicClient;
         }
 
-        [HttpGet("get-playlists")]
+        [HttpGet("get-playlist")]
         public async Task<IActionResult> GetUserPlaylist(string playlistId)
         {
             var playlist = await _musicClient.GetPlaylist(playlistId);
@@ -36,5 +36,14 @@ namespace MusicAPI.Controllers
                 return Ok(authorizationLink);
             }
         }
+
+        [HttpGet("get-currret-user-playlists")]
+        public async Task<IActionResult> GetCurUserPlaylists()
+        {
+            var playlists = await _musicClient.GetCurrentUserPlaylistList();
+            return Ok(playlists);
+        }
+
+
     }
 }

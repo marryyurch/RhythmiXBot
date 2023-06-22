@@ -12,9 +12,11 @@ namespace TelegramBot
     internal class RhythmiXBot
     { 
         private static ITelegramBotClient _bot = new TelegramBotClient("6176276102:AAEB69OIlMAhy9O8ULRMA-1MxkzB6EYwHzQ");
-        public static Dictionary<long, UserData> usersData = new();
+        public static Dictionary<long, UserData> usersData = new(); // bot user id and user data
         public static Update previousUpdate = new();
-        
+
+        public static Dictionary<long, long> callbackMessageUserIds = new(); // callback user id and Message user id 
+
         public static void Start()
         {
             Console.WriteLine("Запущен бот " + _bot.GetMeAsync().Result.FirstName);
@@ -59,60 +61,18 @@ namespace TelegramBot
                         await UserData.HandleCallbackQuery(botClient, previousUpdate.CallbackQuery);
                         UserData.State = UserInputState.None;
                         return;
+
+                    case UserInputState.SongName:
+                        UserData.SongName = update.Message.Text;
+                        await UserData.HandleCallbackQuery(botClient, previousUpdate.CallbackQuery);
+                        UserData.State = UserInputState.None;
+                        return;
                 }
 
                 var message = update.Message;
                 if (message.Type == MessageType.Audio)
                 {
-                    string name = "", artist = "";
-                    var file = await botClient.GetFileAsync(message.Audio.FileId);
-
-                    var stream = new FileStream($"music\\{artist} - {name}.mp3", FileMode.Create);
-                    
-                    
-                    await botClient.DownloadFileAsync(file.FilePath, stream);
-
-                    stream.Close();
-                    var files = new FileInfo(stream.Name); // Replace with the actual file path
-                    stream.Close();
-                    var bucketName = message.From.FirstName.ToLower() + "-bucket";
-                    var fileFormData = new MultipartFormDataContent
-                    {
-                        { new StreamContent(files.OpenRead()), "file", files.Name },
-                        { new StringContent(bucketName), "bucketName" },
-                        { new StringContent("music"), "prefix" }
-                    };
-                    HttpClient _s3Client = new()
-                    {
-                        BaseAddress = new Uri("https://localhost:7065/")
-                    };
-
-                    await _s3Client.PostAsync($"api/buckets/create?bucketName={bucketName}", new StringContent("bucket-name"));
-
-                    var response = _s3Client.PostAsync("api/files/upload", fileFormData);
-                    if (!response.IsCompletedSuccessfully)
-                        Console.WriteLine(response.Status);
-                    
-                    //var request = await _s3Client.PostAsync("api/files/upload", fileFormData);
-                    //if (request.IsSuccessStatusCode)
-                    //{
-                    //    await botClient.SendTextMessageAsync(message.Chat, "Success.");
-                    //}
-                    //else
-                    //{
-                    //    try
-                    //    {
-                    //        var response = await _s3Client.PostAsync($"api/buckets/create?bucketName={message.From.FirstName}-bucket", new StringContent($"name-bucket"));
-                    //        response.EnsureSuccessStatusCode();
-
-                    //        var responseContent = await response.Content.ReadAsStringAsync();
-                    //        Console.WriteLine(responseContent);
-                    //    }
-                    //    await _s3Client.PostAsync("api/files/upload", fileFormData);
-
-                    //}
-
-                    //await S3ApiHandler.UploadUserTrack(stream);
+                    await S3ApiHandler.UploadUserTrack(botClient, message, UserData);
                 }
                 else
                 {
@@ -159,6 +119,11 @@ namespace TelegramBot
                         await UserData.HandleCallbackQuery(botClient, previousUpdate.CallbackQuery);
                         UserData.State = UserInputState.None;
                         return;
+                    case UserInputState.SongName:
+                        UserData.SongName = update.Message.Text;
+                        await UserData.HandleCallbackQuery(botClient, previousUpdate.CallbackQuery);
+                        UserData.State = UserInputState.None;
+                        return;
                 }
 
                 var callbackQuery = update.CallbackQuery;
@@ -170,6 +135,7 @@ namespace TelegramBot
         {
             await CallbackQueryHandler.HandleUserCallbackQueryAsync(botClient, callbackQuery);
             await CallbackQueryHandler.HandleLibraryOpsCallbackQueryAsync(botClient, callbackQuery);
+            await CallbackQueryHandler.HandleSpotiOpsCallbackQueryAsync(botClient, callbackQuery);
             await CallbackQueryHandler.HandleMusicOpsCallbackQueryAsync(botClient, callbackQuery);
         }
         public static Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)

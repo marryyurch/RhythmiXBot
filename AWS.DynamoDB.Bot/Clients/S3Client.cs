@@ -51,12 +51,14 @@ namespace AWS.DynamoDB.Bot.Clients
         public async Task<bool> UploadFileAsync(IFormFile file, string bucketName, string? prefix)
         {
             var bucketExists = await _s3Client.DoesS3BucketExistAsync(bucketName);
+            //IFormFile newFile = new FormFile()
             if (!bucketExists) return false;
             var request = new PutObjectRequest()
             {
                 BucketName = bucketName,
                 Key = string.IsNullOrEmpty(prefix) ? file.FileName : $"{prefix?.TrimEnd('/')}/{file.FileName}",
-                InputStream = file.OpenReadStream()
+                InputStream = file.OpenReadStream(),
+                ContentType = file.ContentType,
             };
             request.Metadata.Add("Content-Type", file.ContentType);
             await _s3Client.PutObjectAsync(request);

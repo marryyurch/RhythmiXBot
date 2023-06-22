@@ -8,7 +8,7 @@ enum UserInputState
     None,
     Name,
     Password,
-    File
+    SongName
 }
 class UserData
 {
@@ -16,6 +16,9 @@ class UserData
 
     public string Name;
     public string Password;
+    public string SongName;
+
+    public Dictionary<string, string> songNames = new (); // file_id and file name
     ~UserData()
     {
         
@@ -71,6 +74,12 @@ class UserData
                 else
                     await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "You have to sign in.");
 
+                break;
+            }
+            case "deleting song":
+            {
+                string songName = callbackQuery.Message.Text;
+                
                 break;
             }
         }

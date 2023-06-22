@@ -24,17 +24,28 @@ namespace TelegramBot.Handlers
         }
         public static async Task MyLibraryCommand(ITelegramBotClient botClient, Message message)
         {
-            await botClient.SendTextMessageAsync(message.Chat, "Here's your library. You can deal with...", replyMarkup: new InlineKeyboardMarkup(
-                new List<InlineKeyboardButton>()
-                {
-                    InlineKeyboardButton.WithCallbackData("Songs", "dealing with songs"), 
-                    InlineKeyboardButton.WithCallbackData("Playlists", "dealing with playlists"),
-                })
-            );
+            if (await DbApiHandler.IsSignedIn(message.From.Id))
+            {
+                await botClient.SendTextMessageAsync(message.Chat, "Here's your library. You can deal with...",
+                    replyMarkup: new InlineKeyboardMarkup(
+                        new List<InlineKeyboardButton>()
+                        {
+                            InlineKeyboardButton.WithCallbackData("Songs", "dealing with songs"),
+                            InlineKeyboardButton.WithCallbackData("Playlists", "dealing with playlists"),
+                        })
+                );
+            }
+            else
+                await botClient.SendTextMessageAsync(message.Chat, "You have to create profile or sign in first.");
         }
         public static async Task SpotifyCommand(ITelegramBotClient botClient, Message message)
         {
-
+            await botClient.SendTextMessageAsync(message.Chat, "Here's your Spoti prifile. You can...", replyMarkup: new InlineKeyboardMarkup(
+                new List<InlineKeyboardButton>()
+                {
+                    InlineKeyboardButton.WithCallbackData("Get all my playlists", "getting all spoty users' playlists"),
+                    InlineKeyboardButton.WithCallbackData("Get someone's playlists", "getting someone's playlists"),
+                }));
         }
         public static async Task HelpCommand(ITelegramBotClient botClient, Message message)
         {
