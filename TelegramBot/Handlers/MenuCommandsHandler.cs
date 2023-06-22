@@ -49,7 +49,7 @@ namespace TelegramBot.Handlers
         }
         public static async Task HelpCommand(ITelegramBotClient botClient, Message message)
         {
-            await botClient.SendTextMessageAsync(message.Chat, "Help text");
+            await botClient.SendTextMessageAsync(message.Chat, "What you can ?\n• Adding music files to your personal music library\r\n• Removing these files\r\n• Adding collections for these files (playlists)\r\n• Removing these collections\r\n• Searching for specific songs or playlists\r\n• Adding music files to collections\r\n• Connecting the user to Spotify");
         }
     }
 }

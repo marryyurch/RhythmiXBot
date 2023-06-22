@@ -95,7 +95,7 @@ namespace TelegramBot.Handlers
                         {
                             new() {InlineKeyboardButton.WithCallbackData("Create", "creating playlist"), InlineKeyboardButton.WithCallbackData("Show all", "showing all playlists")},
                             new() {InlineKeyboardButton.WithCallbackData("Delete", "deleting playlist"), InlineKeyboardButton.WithCallbackData("Delete all", "deleting all playlists")},
-                            new() {InlineKeyboardButton.WithCallbackData("Search","searching playlist")}
+                            new() {InlineKeyboardButton.WithCallbackData("Search","searching playlist"), InlineKeyboardButton.WithCallbackData("Add to playlist", "adding to playlist")}
                         })
                     );
                     await botClient.AnswerCallbackQueryAsync(callbackQuery.Id);
@@ -191,30 +191,64 @@ namespace TelegramBot.Handlers
                     
                 case "creating playlist":
                 {
-
+                    await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Enter playlist name");
+                    await RhythmiXBot.usersData[callbackQuery.From.Id].HandleCallbackQuery(botClient, callbackQuery);
+                    
                     await botClient.AnswerCallbackQueryAsync(callbackQuery.Id);
                     break;
                 }
                 case "showing all playlists":
                 {
-
+                    if (!await PlaylistManager.IsPlaylistContainerEmpty(botClient, callbackQuery))
+                        //await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "All your playlists:");
+                        await PlaylistManager.ShowAllPlaylists(botClient, callbackQuery);
+                    else await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "You have no playlists.");
                     await botClient.AnswerCallbackQueryAsync(callbackQuery.Id);
                     break;
                 }
                 case "deleting playlist":
                 {
+                    if (!await PlaylistManager.IsPlaylistContainerEmpty(botClient, callbackQuery))
+                    {
+                        await PlaylistManager.ShowAllPlaylists(botClient, callbackQuery);
+                        await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Enter playlist name");
+                        await RhythmiXBot.usersData[callbackQuery.From.Id].HandleCallbackQuery(botClient, callbackQuery);
+                    }
+                    else await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "You have no playlists");
 
                     await botClient.AnswerCallbackQueryAsync(callbackQuery.Id);
                     break;
                 }
                 case "deleting all playlists":
                 {
-
+                    if (!await PlaylistManager.IsPlaylistContainerEmpty(botClient, callbackQuery))
+                        if (await PlaylistManager.DeleteAllPlaylist(botClient, callbackQuery))
+                            await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Deleted all playlists successfully.");
+                        else await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "You already have no playlists.");
                     await botClient.AnswerCallbackQueryAsync(callbackQuery.Id);
                     break;
                 }
                 case "searching playlist":
                 {
+                    if (!await PlaylistManager.IsPlaylistContainerEmpty(botClient, callbackQuery))
+                    {
+                        await PlaylistManager.ShowAllPlaylists(botClient, callbackQuery);
+                        await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Enter playlist name");
+                        await RhythmiXBot.usersData[callbackQuery.From.Id].HandleCallbackQuery(botClient, callbackQuery);
+                    }
+                    else await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "You have no playlists");
+
+                    await botClient.AnswerCallbackQueryAsync(callbackQuery.Id);
+                    break;
+                }
+                case "adding to playlist":
+                {
+                    if (!await PlaylistManager.IsPlaylistContainerEmpty(botClient, callbackQuery))
+                    {
+                        await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Enter playlist name");
+                        await RhythmiXBot.usersData[callbackQuery.From.Id].HandleCallbackQuery(botClient, callbackQuery);
+                    }
+                    else await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "You have no playlists");
 
                     await botClient.AnswerCallbackQueryAsync(callbackQuery.Id);
                     break;

@@ -13,7 +13,7 @@ namespace TelegramBot.Handlers
         {
             BaseAddress = new Uri("https://localhost:7065/")
         };
-        private static Dictionary<long, Dictionary<string, string>> allMusicFiles = new (); // bot chat id, (song id, song name)
+        public static Dictionary<long, Dictionary<string, string>> allMusicFiles = new (); // bot chat id, (song id, song name)
 
         public static async Task<bool> DownloadAllSongs(ITelegramBotClient botClient, CallbackQuery? callbackQuery)
         {

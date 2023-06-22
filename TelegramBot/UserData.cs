@@ -8,7 +8,8 @@ enum UserInputState
     None,
     Name,
     Password,
-    SongName
+    SongName,
+    PlaylistName
 }
 class UserData
 {
@@ -17,6 +18,7 @@ class UserData
     public string Name;
     public string Password;
     public string SongName;
+    public string PlaylistName;
 
     public Dictionary<string, string> songNames = new (); // file_id and file name
     ~UserData()
@@ -99,6 +101,62 @@ class UserData
                 }
 
                 State = UserInputState.SongName;
+                break;
+            }
+            case "creating playlist":
+            {
+                if (State != UserInputState.None)
+                {
+                    if (await PlaylistManager.CreatePlaylist(botClient, callbackQuery, PlaylistName))
+                        await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Created successfully.");
+                    else await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "This playlist name is already exist.");
+                    break;
+                }
+
+                State = UserInputState.PlaylistName;
+                break;
+            }
+            case "deleting playlist":
+            {
+                if (State != UserInputState.None)
+                {
+                    if (await PlaylistManager.DeletePlaylist(botClient, callbackQuery, PlaylistName))
+                        await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Deleted successfully.");
+                    else await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "This playlist does not exist.");
+                    break;
+                }
+
+                State = UserInputState.PlaylistName;
+                break;
+            }
+            case "searching playlist":
+            {
+                if (State != UserInputState.None)
+                {
+                    if (await PlaylistManager.SearchPlaylist(botClient, callbackQuery, PlaylistName))
+                        await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Found.");
+                    else await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "This playlist does not exist.");
+                    break;
+                }
+
+                State = UserInputState.PlaylistName;
+                break;
+            }
+            case "adding to playlist":
+            {
+                if (State == UserInputState.SongName)
+                {
+                    if (await PlaylistManager.AddToPlaylist(botClient, callbackQuery, PlaylistName, SongName))
+                        await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Added successfully.");
+                    else await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Something went wrong..");
+                }
+                if (State == UserInputState.PlaylistName)
+                {
+                    await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Enter song name");
+                    State = UserInputState.SongName;
+                }
+
+                State = UserInputState.PlaylistName;
                 break;
             }
         }

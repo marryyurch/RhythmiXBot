@@ -67,6 +67,11 @@ namespace TelegramBot
                         await UserData.HandleCallbackQuery(botClient, previousUpdate.CallbackQuery);
                         UserData.State = UserInputState.None;
                         return;
+                    case UserInputState.PlaylistName:
+                        UserData.PlaylistName = update.Message.Text;
+                        await UserData.HandleCallbackQuery(botClient, previousUpdate.CallbackQuery);
+                        UserData.State = UserInputState.None;
+                        return;
                 }
 
                 var message = update.Message;
@@ -123,6 +128,11 @@ namespace TelegramBot
                         UserData.SongName = update.Message.Text;
                         await UserData.HandleCallbackQuery(botClient, previousUpdate.CallbackQuery);
                         //UserData.State = UserInputState.None;
+                        return;
+                    case UserInputState.PlaylistName:
+                        UserData.PlaylistName = update.Message.Text;
+                        await UserData.HandleCallbackQuery(botClient, previousUpdate.CallbackQuery);
+                        UserData.State = UserInputState.None;
                         return;
                 }
 
