@@ -153,8 +153,12 @@ namespace TelegramBot.Handlers
                 }
                 case "deleting song":
                 {
-                    await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Enter song name");
-
+                    if (!await S3ApiHandler.IsLibraryEmpty(botClient, callbackQuery))
+                    {
+                        await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Enter song name");
+                        await RhythmiXBot.usersData[callbackQuery.From.Id].HandleCallbackQuery(botClient, callbackQuery);
+                    }
+                    else await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Your library is empty.");
                     await botClient.AnswerCallbackQueryAsync(callbackQuery.Id);
                     break;
                 }

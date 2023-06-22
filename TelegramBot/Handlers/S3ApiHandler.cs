@@ -70,5 +70,32 @@ namespace TelegramBot.Handlers
             
             return true;
         }
+
+        public static async Task<bool> DeleteSong(ITelegramBotClient botClient, CallbackQuery? callbackQuery, string songName)
+        {
+            if (allMusicFiles.ContainsKey(callbackQuery.Message.Chat.Id))
+            {
+                foreach (var songId in allMusicFiles[callbackQuery.Message.Chat.Id].Keys)
+                    if (allMusicFiles[callbackQuery.Message.Chat.Id][songId] == songName)
+                    {
+                        allMusicFiles[callbackQuery.Message.Chat.Id].Remove(songId);
+                        return true;
+                    }
+            }
+            else
+            {
+                await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Your library is empty.");
+                return false;
+            }
+
+            return false;
+        }
+
+        public static async Task<bool> IsLibraryEmpty(ITelegramBotClient botClient, CallbackQuery? callbackQuery)
+        {
+            if (allMusicFiles.ContainsKey(callbackQuery.Message.Chat.Id))
+                return false;
+            return true;
+        }
     }
 }

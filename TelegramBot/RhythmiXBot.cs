@@ -122,7 +122,7 @@ namespace TelegramBot
                     case UserInputState.SongName:
                         UserData.SongName = update.Message.Text;
                         await UserData.HandleCallbackQuery(botClient, previousUpdate.CallbackQuery);
-                        UserData.State = UserInputState.None;
+                        //UserData.State = UserInputState.None;
                         return;
                 }
 

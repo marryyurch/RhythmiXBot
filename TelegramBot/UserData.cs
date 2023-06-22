@@ -78,8 +78,15 @@ class UserData
             }
             case "deleting song":
             {
-                string songName = callbackQuery.Message.Text;
-                
+                if (State != UserInputState.None)
+                {
+                    if (await S3ApiHandler.DeleteSong(botClient, callbackQuery, SongName))
+                        await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Delete successfully.");
+                    //else
+                    //    await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Something went wrong..");
+                    break;
+                }
+                State = UserInputState.SongName;
                 break;
             }
         }
