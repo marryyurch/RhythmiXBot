@@ -146,8 +146,12 @@ namespace TelegramBot.Handlers
                 }
                 case "showing all songs":
                 {
-                    await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Here's all your songs");
-                    await S3ApiHandler.DownloadAllSongs(botClient, callbackQuery);
+                    if (!await S3ApiHandler.IsLibraryEmpty(botClient, callbackQuery))
+                    {
+                        await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Here's all your songs");
+                        await S3ApiHandler.DownloadAllSongs(botClient, callbackQuery);
+                    }
+                    else await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Your library is empty.");
                     await botClient.AnswerCallbackQueryAsync(callbackQuery.Id);
                     break;
                 }
@@ -164,13 +168,23 @@ namespace TelegramBot.Handlers
                 }
                 case "deleting all songs":
                 {
-
+                    if (!await S3ApiHandler.IsLibraryEmpty(botClient, callbackQuery))
+                    {
+                        await S3ApiHandler.DeleteAllSongs(botClient, callbackQuery);
+                        await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "All songs deleted successfully.");
+                    }
+                    else await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Your library is already empty.");
                     await botClient.AnswerCallbackQueryAsync(callbackQuery.Id);
                     break;
                 }
                 case "searching song":
                 {
-
+                    if (!await S3ApiHandler.IsLibraryEmpty(botClient, callbackQuery))
+                    {
+                        await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Enter song name");
+                        await RhythmiXBot.usersData[callbackQuery.From.Id].HandleCallbackQuery(botClient, callbackQuery);
+                    }
+                    else await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Your library is empty.");
                     await botClient.AnswerCallbackQueryAsync(callbackQuery.Id);
                     break;
                 }

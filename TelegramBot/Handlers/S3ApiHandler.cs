@@ -97,5 +97,38 @@ namespace TelegramBot.Handlers
                 return false;
             return true;
         }
+
+        public static async Task<bool> DeleteAllSongs(ITelegramBotClient botClient, CallbackQuery? callbackQuery)
+        {
+            if (allMusicFiles.ContainsKey(callbackQuery.Message.Chat.Id))
+                allMusicFiles.Remove(callbackQuery.Message.Chat.Id);
+            else
+            {
+                await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Your library already is empty.");
+                return false;
+            }
+
+            return false;
+        }
+
+        public static async Task<bool> SearchSong(ITelegramBotClient botClient, CallbackQuery? callbackQuery, string songName)
+        {
+            if (allMusicFiles.ContainsKey(callbackQuery.Message.Chat.Id))
+            {
+                foreach (var songId in allMusicFiles[callbackQuery.Message.Chat.Id].Keys)
+                    if (allMusicFiles[callbackQuery.Message.Chat.Id][songId] == songName)
+                    {
+                        await botClient.SendAudioAsync(callbackQuery.Message.Chat, InputFile.FromFileId(songId));
+                        return true;
+                    }
+            }
+            else
+            {
+                await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "Your library is empty.");
+                return false;
+            }
+
+            return false;
+        }
     }
 }

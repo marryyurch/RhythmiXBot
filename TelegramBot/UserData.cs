@@ -89,6 +89,18 @@ class UserData
                 State = UserInputState.SongName;
                 break;
             }
+            case "searching song":
+            {
+                if (State != UserInputState.None)
+                {
+                    if (!await S3ApiHandler.SearchSong(botClient, callbackQuery, SongName))
+                        await botClient.SendTextMessageAsync(callbackQuery.Message.Chat, "I can't find it..");
+                    break;
+                }
+
+                State = UserInputState.SongName;
+                break;
+            }
         }
     }
 }
